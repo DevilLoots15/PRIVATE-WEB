@@ -1,1 +1,1023 @@
-.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crunchyroll Account Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ff5252;
+            --primary-dark: #e53935;
+            --secondary: #6c63ff;
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-card-hover: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #888888;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .input-section, .results-section {
+            background: var(--dark-card);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .input-section:hover, .results-section:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tooltip i {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+#accountsInput {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 15px;
+            margin-bottom: 15px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        #accountsInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255, 82, 82, 0.2);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .counter {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 82, 82, 0.4);
+        }
+
+        .primary-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            backdrop-filter: blur(10px);
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.total {
+            background: rgba(108, 99, 255, 0.2);
+            color: var(--secondary);
+        }
+
+        .stat-icon.valid {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .stat-icon.invalid {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .results-container {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .results-list {
+            height: 100%;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+.empty-state {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .result-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .result-item.valid {
+            border-left-color: var(--success);
+        }
+
+        .result-item.invalid {
+            border-left-color: var(--error);
+        }
+
+        .result-item.error {
+            border-left-color: var(--warning);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .account {
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .status-valid {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .status-invalid {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        .status-error {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .progress-section {
+            background: var(--dark-card);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-content {
+            background: var(--dark-card);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-mini {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+.mini-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .input-section, .results-section {
+                padding: 15px;
+            }
+            
+            .input-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            button {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+        
+        .notification.notification-error { background: #f44336; }
+        .notification.notification-info { background: #6c63ff; }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <h1>Crunchyroll Account Checker</h1>
+            </div>
+            <p>Verify the validity of your Crunchyroll accounts</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-keyboard"></i> Enter Accounts</h2>
+                    <div class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">Enter accounts in email:password format, one per line (max 100)</span>
+                    </div>
+                </div>
+                <div class="input-container">
+                    <textarea id="accountsInput" placeholder="email:password&#10;example@gmail.com:password123&#10;user@yahoo.com:pass123"></textarea>
+                    <div class="input-footer">
+                        <div class="counter">
+                            <span id="accountCount">0</span> / 100 accounts
+                        </div>
+                        <div class="actions">
+                            <button id="clearBtn" class="secondary-btn">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button id="checkBtn" class="primary-btn">
+                                <i class="fas fa-play"></i> Check Accounts
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+            
+            <div class="results-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Results</h2>
+                    <button id="exportBtn" class="secondary-btn">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalCount">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon valid">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="validCount">0</span>
+                            <span class="stat-label">Valid</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon invalid">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="invalidCount">0</span>
+                            <span class="stat-label">Invalid</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-container">
+                    <div id="resultsList" class="results-list"></div>
+                    <div id="emptyState" class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No results yet</h3>
+                        <p>Enter accounts and click "Check Accounts" to see results here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-section" id="progressSection">
+            <div class="progress-header">
+                <h3>Checking Accounts</h3>
+                <span id="progressText">0% (0/0)</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <h3>Checking Accounts</h3>
+                <p>Please wait while we verify your accounts</p>
+                <div class="progress-mini">
+                    <div id="miniProgress" class="mini-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Config
+        const DELAY_BETWEEN = 200; // milliseconds, for simulating network latency
+
+        // DOM elements
+        const accountsInput = document.getElementById('accountsInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const accountCount = document.getElementById('accountCount');
+        const resultsList = document.getElementById('resultsList');
+        const emptyState = document.getElementById('emptyState');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const progressSection = document.getElementById('progressSection');
+
+const progressText = document.getElementById('progressText');
+        const progressFill = document.getElementById('progressFill');
+        const miniProgress = document.getElementById('miniProgress');
+        const totalCount = document.getElementById('totalCount');
+        const validCount = document.getElementById('validCount');
+        const invalidCount = document.getElementById('invalidCount');
+
+        // State
+        let stats = {
+            total: 0,
+            valid: 0,
+            invalid: 0
+        };
+
+        let accounts = [];
+        let currentIndex = 0;
+        let isChecking = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAccountCount();
+        });
+
+        // Update account counter
+        accountsInput.addEventListener('input', updateAccountCount);
+
+        function updateAccountCount() {
+            const lines = accountsInput.value.split('\n').filter(line => line.trim() !== '');
+            const accountLines = lines.filter(line => line.includes(':'));
+            accountCount.textContent = accountLines.length;
+        }
+
+        // Clear input
+        clearBtn.addEventListener('click', () => {
+            const modal = createModal('Are you sure?', 'This will clear all accounts from the input field.', () => {
+                accountsInput.value = '';
+                updateAccountCount();
+                clearResults();
+                modal.remove();
+            });
+            document.body.appendChild(modal);
+        });
+
+        // Export results
+        exportBtn.addEventListener('click', exportResults);
+
+        function exportResults() {
+            if (stats.total === 0) {
+                showNotification('No results to export', 'error');
+                return;
+            }
+            
+            let content = "Crunchyroll Account Checker Results\n";
+            content += Generated on: ${new Date().toLocaleString()}\n;
+            content += Total: ${stats.total}, Valid: ${stats.valid}, Invalid: ${stats.invalid}\n\n;
+            
+            const resultItems = document.querySelectorAll('.result-item');
+            resultItems.forEach(item => {
+                const account = item.querySelector('.account').textContent;
+                const status = item.querySelector('.status').textContent;
+                const message = item.querySelector('.message').textContent;
+                content += ${account} - ${status} - ${message}\n;
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = crunchyroll_results_${Date.now()}.txt;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+        }
+
+        // Check accounts
+        checkBtn.addEventListener('click', async () => {
+            if (isChecking) {
+                stopChecking();
+                return;
+            }
+            
+            accounts = parseAccounts(accountsInput.value);
+            
+            if (accounts.length === 0) {
+                showNotification('Please enter at least one account in email:password format', 'error');
+                return;
+            }
+            
+            if (accounts.length > 100) {
+                showNotification('Maximum 100 accounts allowed', 'error');
+                return;
+            }
+            
+            startChecking();
+        });
+
+        // Parse accounts from text input
+        function parseAccounts(text) {
+            const lines = text.split('\n');
+            const accounts = [];
+            
+            for (const line of lines) {
+
+const cleanedLine = cleanLine(line);
+                if (cleanedLine.includes(':')) {
+                    const [email, password] = cleanedLine.split(':', 2);
+                    accounts.push({
+                        email: email.trim(),
+                        password: password.trim()
+                    });
+                }
+            }
+            return accounts;
+        }
+
+        // Clean line from non-printable characters
+        function cleanLine(line) {
+            return line.trim().replace(/[^\x20-\x7E]/g, '');
+        }
+
+        // Start the checking process
+        function startChecking() {
+            isChecking = true;
+            currentIndex = 0;
+            
+            // Update UI
+            checkBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Checking';
+            checkBtn.style.background = 'linear-gradient(135deg, var(--error), #c62828)';
+            clearResults();
+            resetStats();
+            updateStats();
+            
+            // Show loading and progress
+            loadingOverlay.style.display = 'flex';
+            progressSection.style.display = 'block';
+            updateProgress();
+            
+            // Start checking
+            checkNextAccount();
+        }
+
+        // Stop the checking process
+        function stopChecking() {
+            isChecking = false;
+            
+            // Update UI
+            checkBtn.innerHTML = '<i class="fas fa-play"></i> Check Accounts';
+            checkBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+            loadingOverlay.style.display = 'none';
+            
+            showNotification('Account checking stopped', 'info');
+        }
+
+        // Check the next account in the queue
+        async function checkNextAccount() {
+            if (!isChecking || currentIndex >= accounts.length) {
+                // Finished checking all accounts
+                isChecking = false;
+                loadingOverlay.style.display = 'none';
+                checkBtn.innerHTML = '<i class="fas fa-play"></i> Check Accounts';
+                checkBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+                
+                if (currentIndex >= accounts.length) {
+                    showNotification(Finished checking ${accounts.length} accounts, 'success');
+                }
+                return;
+            }
+            
+            const { email, password } = accounts[currentIndex];
+            
+            // Simulate API call with a delay
+            await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN));
+
+            // Simulate result
+            const isInvalid = (currentIndex % 3 === 0 && email.length > 5);
+            const isError = (currentIndex % 7 === 0);
+            
+            if (isError) {
+                addResult(email, password, 'error', Simulated: Error connecting to server.);
+                stats.invalid++;
+            } else if (isInvalid) {
+                addResult(email, password, 'invalid', Simulated: Invalid email or password.);
+                stats.invalid++;
+            } else {
+                addResult(email, password, 'valid', Simulated: Premium: Yes);
+                stats.valid++;
+            }
+            
+            stats.total++;
+            updateStats();
+            
+            currentIndex++;
+            updateProgress();
+            
+            // Continue to the next account
+            checkNextAccount();
+        }
+
+        // Add result to the UI
+        function addResult(email, password, status, message) {
+            // Hide empty state if it's visible
+            if (emptyState.style.display !== 'none') {
+                emptyState.style.display = 'none';
+            }
+
+const resultItem = document.createElement('div');
+            resultItem.className = result-item ${status};
+            
+            const statusText = status === 'valid' ? 'VALID' : status === 'invalid' ? 'INVALID' : 'ERROR';
+            
+            resultItem.innerHTML = 
+                <div class="result-header">
+                    <span class="account">${email}</span>
+                    <span class="status status-${status}">${statusText}</span>
+                </div>
+                <div class="message">${message}</div>
+            ;
+            
+            resultsList.appendChild(resultItem);
+            resultsList.scrollTop = resultsList.scrollHeight;
+        }
+
+        // Update stats display
+        function updateStats() {
+            totalCount.textContent = stats.total;
+            validCount.textContent = stats.valid;
+            invalidCount.textContent = stats.invalid;
+        }
+
+        // Update progress display
+        function updateProgress() {
+            const percent = accounts.length > 0 ? Math.round((currentIndex / accounts.length) * 100) : 0;
+            progressText.textContent = ${percent}% (${currentIndex}/${accounts.length});
+            progressFill.style.width = ${percent}%;
+            miniProgress.style.width = ${percent}%;
+        }
+
+        // Reset stats
+        function resetStats() {
+            stats = {
+                total: 0,
+                valid: 0,
+                invalid: 0
+            };
+        }
+
+        // Clear results
+        function clearResults() {
+            resultsList.innerHTML = '';
+            emptyState.style.display = 'flex';
+        }
+
+        // Show a custom notification
+        function showNotification(message, type = 'info') {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = notification notification-${type};
+            notification.innerHTML = 
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            ;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Create a custom modal for user confirmation
+        function createModal(title, message, onConfirm) {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.style.cssText = 
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+            ;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = 
+                background: var(--dark-card);
+                padding: 30px;
+                border-radius: var(--border-radius);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+            ;
+
+            const modalTitle = document.createElement('h3');
+            modalTitle.textContent = title;
+            modalTitle.style.marginBottom = '15px';
+
+const modalMessage = document.createElement('p');
+            modalMessage.textContent = message;
+            modalMessage.style.color = 'var(--text-muted)';
+            modalMessage.style.marginBottom = '25px';
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'center';
+            buttonContainer.style.gap = '15px';
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'primary-btn';
+            confirmBtn.textContent = 'Confirm';
+            confirmBtn.onclick = onConfirm;
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'secondary-btn';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = () => modalOverlay.remove();
+            
+            buttonContainer.appendChild(confirmBtn);
+            buttonContainer.appendChild(cancelBtn);
+
+            modalContent.appendChild(modalTitle);
+            modalContent.appendChild(modalMessage);
+            modalContent.appendChild(buttonContainer);
+            modalOverlay.appendChild(modalContent);
+
+            return modalOverlay;
+        }
+
+    </script>
+</body>
+</html>
